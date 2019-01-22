@@ -1,0 +1,72 @@
+{
+  "version": "1.0.0",
+  "name": "Connector Immea",
+  "type": "konnector",
+  "language": "node",
+  "icon": "icon.png",
+  "slug": "immea",
+  "source": "git://github.com/konnectors/immea.git",
+  "editor": "Marc Polycarpe",
+  "vendor_link": "https://www.immea.fr/fr",
+  "categories": ["other"],
+  "fields": {
+    "login": {
+      "type": "text"
+    },
+    "password": {
+      "type": "password"
+    },
+    "advancedFields": {
+      "folderPath": {
+        "advanced": true,
+        "isRequired": false
+      }
+    }
+  },
+  "data_types": [
+    "files"
+  ],
+  "screenshots": [],
+  "permissions": {
+    "files": {
+      "type": "io.cozy.files"
+    },
+    "accounts": {
+      "type": "io.cozy.accounts",
+      "verbs": ["GET"]
+    }
+  },
+  "developer": {
+    "name": "Marc Polycarpe",
+    "url": "https://cozy.io"
+  },
+  "langs": ["fr", "en"],
+  "locales": {
+    "fr": {
+      "short_description": "Connecteur IMMEA",
+      "long_description": "Ce connecteur récupère les documents mis a disposition par l'agence de syndic/gestion locative.",
+      "permissions": {
+        "files": {
+          "description": "Utilisé pour sauvegarder les documents du syndic"
+        },
+        "accounts": {
+          "description": "Utilisé pour obtenir les données du compte"
+        }
+      }
+    },
+    "en": {
+      "short_description": "IMMEA Connector",
+      "long_description": "This template fetches documents from the company IMMEA (rental company)",
+      "permissions": {
+        "files": {
+          "description": "Required to save the documents"
+        },
+        "accounts": {
+          "description": "Required to get the account's data"
+        }
+      }
+    }
+  },
+  "banksTransactionRegExp": "\\bimmea\\b",
+  "manifest_version": "2"
+}
