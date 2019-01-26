@@ -19,10 +19,8 @@ const request = requestFactory({
   jar: true
 })
 
-const baseUrl = 'https://immea-enligne.com/index.php'
+const baseUrl = 'https://immea-enligne.com/'
 module.exports = new BaseKonnector(start)
-var cache = []
-const cheerio = require('cheerio')
 
 // The start function is run by the BaseKonnector instance only when it got all the account
 // information (fields). When you run this connector yourself in "standalone" mode or "dev" mode,
@@ -33,13 +31,16 @@ async function start(fields) {
   log('info', 'Successfully logged in')
   // The BaseKonnector instance expects a Promise as return of the function
   log('info', 'Fetching the list of documents')
-  const $ = await request(`https://immea-enligne.com/index.php?c=ged&a=liste`)
-  // cheerio (https://cheerio.js.org/) uses the same api as jQuery (http://jquery.com/)
+  const $ = await request(
+    `https://immea-enligne.com/index.php?c=document&a=mesDocuments`
+  )
+
   log('info', 'Parsing list of documents')
   const documents = await parseDocuments($)
 
   // here we use the saveBills function even if what we fetch are not bills, but this is the most
   // common case in connectors
+  log('info', documents)
   log('info', 'Saving data to Cozy')
   await saveFiles(documents, fields, {
     timeout: Date.now() + 300 * 1000
@@ -51,8 +52,8 @@ async function start(fields) {
 function authenticate(username, password) {
   return signin({
     url: `https://immea-enligne.com/`,
-    formSelector: 'form',
-    formData: { utilisateur: username, mdp: password, connexion: '' },
+    formSelector: '.form-signin',
+    formData: { login: username, mdp: password, connexion: '' },
     headers: {
       'User-Agent':
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
@@ -63,9 +64,7 @@ function authenticate(username, password) {
     // (fullResponse.request.uri.href)...
     validate: (statusCode, $, fullResponse) => {
       if (
-        fullResponse.body.includes(
-          'window.location.replace("index.php?c=accueil&a=show"'
-        )
+        fullResponse.body.includes('index.php?c=defaut&amp;a=terminersession')
       )
         return true
       else return false
@@ -122,7 +121,7 @@ function normalizeFileName(sFileName) {
 
 function GetTitleFromText(oTitle) {
   // Splitte le texte (nom du fichier)
-  tabSplit = oTitle.split('.')
+  var tabSplit = oTitle.split('.')
   //Supprime le dernier element
   tabSplit.pop()
 

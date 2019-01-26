@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "name": "Connector Immea",
+  "name": "Immea",
   "type": "konnector",
   "language": "node",
   "icon": "icon.png",
