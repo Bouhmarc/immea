@@ -6,6 +6,9 @@ const {
   saveFiles,
   log
 } = require('cozy-konnector-libs')
+const path = require('path');
+const url = require('url');
+
 const request = requestFactory({
   // the debug mode shows all the details about http request and responses. Very useful for
   // debugging but very verbose. That is why it is commented out by default
@@ -90,7 +93,10 @@ function parseDocuments($) {
       fileurl: {
         sel: 'a',
         attr: 'href',
-        parse: src => `${baseUrl}${src}`
+        parse: src => decodeURIComponent(`${baseUrl}${src}`)
+      }, 
+      subPath: {
+        fn: node => decodeIDAppartement(node)
       }
     },
     '.tree ul li ul li'
@@ -169,4 +175,67 @@ function getDateFromTitle(sTitle) {
   }
 
   return new Date(nYear + '-' + nMonth + '-' + nDay)
+}
+
+function decodeIDAppartement(oNode)
+{
+
+  var sSousRepertoire = ''
+  var sNomRepertoireCourant = ''
+  var oParent = oNode[0].parent
+
+  while (oParent)
+  {
+
+    if (oParent.attribs && oParent.attribs.class == 'directory')
+    {
+      // C'est un répertoire
+      // on prend le deux noeuds précédents, le dernier fils et sa donnée
+      sNomRepertoireCourant = oParent.prev.prev.lastChild.data
+
+      sNomRepertoireCourant = sNomRepertoireCourant.trim();
+      sNomRepertoireCourant = sNomRepertoireCourant.replace("/","-")
+      sSousRepertoire = path.join(sNomRepertoireCourant, sSousRepertoire)
+     
+
+      // Remonte sur le parent et continue
+      oParent = oParent.parent
+      continue
+    }
+    
+    if (oParent.attribs && (oParent.attribs.class == 'collapse' || oParent.attribs.class == 'show'))
+    {
+
+      sNomRepertoireCourant = oParent.prev.prev.children[1].children[1].children[1].data
+      sNomRepertoireCourant = sNomRepertoireCourant.trim();
+      sNomRepertoireCourant = sNomRepertoireCourant.replace("/","-")
+
+      sSousRepertoire = path.join(sNomRepertoireCourant, sSousRepertoire)
+      break; 
+    }
+
+    // On remonte sur le parent
+    oParent = oParent.parent
+    
+  }
+
+  return sSousRepertoire
+
+  // Supprime le \n
+
+
+
+
+
+  // parse l'url
+  var q = url.parse(sURL, true);
+  // récupère les paramètres
+  var qs = q.query;
+  var vObjet = JSON.parse(qs.p1)
+  return vObjet
+
+
+
+
+
 }
